@@ -1,0 +1,360 @@
+```html:App Stock Deportivo:index.html
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stock Material - Club Deportivo</title>
+
+    <!-- Meta tags para PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Stock Club">
+    
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Librerías Externas -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* IMAGEN DE FONDO DEPORTIVA */
+        :root {
+            /* Textura oscura para darle un toque premium */
+            --bg-image: url('https://images.unsplash.com/photo-1556816723-1ce827b9ef96?q=80&w=2000&auto=format&fit=crop');
+        }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f1f5f9;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Capa oscura sobre el fondo para que el texto sea legible */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.85); /* Slate 900 con opacidad */
+            z-index: -1;
+        }
+
+        .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        ::-webkit-scrollbar { display: none; }
+        .btn-press:active { transform: scale(0.96); }
+    </style>
+</head>
+<body class="min-h-screen selection:bg-blue-900 pb-24">
+
+    <div class="w-full max-w-3xl mx-auto p-4 sm:p-6">
+        
+        <!-- Cabecera -->
+        <header class="flex items-center justify-between mb-6 bg-slate-900/80 backdrop-blur-xl p-4 md:p-5 rounded-3xl shadow-2xl border border-slate-700/50">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-blue-900/40 rounded-full border border-blue-800/50 shadow-inner">
+                    <i data-lucide="shield" class="w-7 h-7 text-blue-400"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Club Deportivo</span>
+                    <h1 class="text-xl sm:text-2xl font-black text-white leading-none drop-shadow-md">Control de Material</h1>
+                </div>
+            </div>
+            
+            <div class="flex items-center hidden sm:flex">
+                <div class="bg-blue-900/40 border border-blue-800/50 px-3 py-1.5 rounded-lg text-blue-400 font-bold text-xs uppercase tracking-widest shadow-inner flex items-center gap-1.5">
+                    <i data-lucide="shirt" class="w-3.5 h-3.5"></i> Equipaciones
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Banner Fotográfico -->
+            <div class="mb-8 relative rounded-[2rem] overflow-hidden shadow-2xl border border-slate-700/50 h-36 md:h-48 animate-fade-in">
+                <!-- Imagen de un campo/vestuario de fútbol -->
+                <img src="https://images.unsplash.com/photo-1518605368461-1ee125225d20?q=80&w=1000&auto=format&fit=crop" alt="Campo de fútbol" class="absolute inset-0 w-full h-full object-cover object-center opacity-70">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/40 to-transparent"></div>
+                <div class="absolute bottom-5 left-5 sm:left-6 z-10">
+                    <p class="text-blue-400 font-bold text-[10px] sm:text-xs uppercase tracking-widest drop-shadow-md mb-1.5 flex items-center gap-1.5">
+                        <i data-lucide="box" class="w-3.5 h-3.5"></i> Inventario
+                    </p>
+                    <h2 class="text-white font-black text-2xl sm:text-3xl drop-shadow-lg tracking-tight">Almacén del Club</h2>
+                </div>
+            </div>
+
+            <!-- Estado de Carga -->
+            <div id="loading" class="flex flex-col items-center justify-center py-16 gap-3">
+                <i data-lucide="loader-2" class="w-10 h-10 text-blue-500 animate-spin"></i>
+                <p class="text-slate-400 font-medium">Cargando inventario...</p>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div id="app-content" class="hidden">
+                
+                <!-- Formulario -->
+                <div class="bg-slate-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50 p-5 sm:p-7 mb-8 animate-fade-in">
+                    <form id="add-form">
+                        <div class="mb-5">
+                            <label class="block text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">¿Qué material falta o hay que pedir?</label>
+                            <input type="text" id="item-text" placeholder="Ej: Faltan 5 pantalones talla M, 2 balones T5..." required
+                                class="w-full text-lg p-4 bg-slate-950 border border-slate-700 rounded-2xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white transition-all outline-none shadow-inner placeholder:text-slate-600" autocomplete="off">
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                            <div class="flex gap-2 w-full sm:w-auto">
+                                <button type="button" onclick="setUrgency('alta')" id="btn-urg-alta" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-sm font-black transition-all bg-red-900/60 text-red-400 border border-red-500/50 shadow-md">
+                                    <i data-lucide="alert-circle" class="w-4 h-4"></i> Urgente
+                                </button>
+                                <button type="button" onclick="setUrgency('media')" id="btn-urg-media" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-sm font-bold transition-all bg-slate-800/80 text-slate-400 border border-slate-700/50 hover:bg-slate-700/80">
+                                    <i data-lucide="clipboard-edit" class="w-4 h-4"></i> Previsión
+                                </button>
+                            </div>
+
+                            <button type="submit" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-8 py-3.5 rounded-xl font-black shadow-lg transition-colors btn-press border border-blue-500/50">
+                                <i data-lucide="plus" class="w-5 h-5"></i>
+                                Añadir al pedido
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Lista de Faltantes -->
+                <div>
+                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-widest mb-4 flex items-center gap-2 ml-2">
+                        <i data-lucide="list-todo" class="w-4 h-4"></i> Lista de Pedidos Pendientes
+                    </h3>
+                    <div id="items-list" class="space-y-4">
+                        <!-- Los items se generarán aquí con JS -->
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Confirmación Eliminar -->
+    <div id="modalConfirmacion" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl p-6 sm:p-8 max-w-sm w-full animate-fade-in text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-blue-500"></div>
+            <div class="bg-blue-900/40 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-400 border border-blue-800/50 shadow-inner">
+                <i data-lucide="package-check" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-2xl font-black text-white mb-2">¿Ya se ha pedido/recibido?</h3>
+            <p class="text-sm text-slate-400 mb-8">Esto eliminará el producto de la lista del club.</p>
+            
+            <div class="flex gap-3">
+                <button type="button" onclick="cerrarModal()" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-xl font-bold transition-all text-sm">
+                    Cancelar
+                </button>
+                <button type="button" id="btn-confirmar-repuesto" class="flex-1 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black transition-all text-sm shadow-lg flex justify-center items-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de Firebase y Lógica -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Mismas claves de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB9PbJS02DWqrbQYLSC50cNhTWsUL9TwP4",
+            authDomain: "fichajes-9e04f.firebaseapp.com",
+            projectId: "fichajes-9e04f",
+            storageBucket: "fichajes-9e04f.firebasestorage.app",
+            messagingSenderId: "628635461198",
+            appId: "1:628635461198:web:6440bdae98afaa796d851f"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appID = "club-deportivo-material"; 
+
+        let currentUser = null;
+        let currentUrgency = 'alta';
+        let itemToDelete = null;
+
+        const loadingDiv = document.getElementById('loading');
+        const contentDiv = document.getElementById('app-content');
+        const itemsList = document.getElementById('items-list');
+        const form = document.getElementById('add-form');
+        const modal = document.getElementById('modalConfirmacion');
+        const btnConfirmar = document.getElementById('btn-confirmar-repuesto');
+
+        lucide.createIcons();
+
+        signInAnonymously(auth).catch(err => console.error("Error Auth:", err));
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if(user) cargarDatos();
+        });
+
+        window.setUrgency = function(level) {
+            currentUrgency = level;
+            const btnAlta = document.getElementById('btn-urg-alta');
+            const btnMedia = document.getElementById('btn-urg-media');
+
+            if(level === 'alta') {
+                btnAlta.className = "flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-sm font-black transition-all bg-red-900/60 text-red-400 border border-red-500/50 shadow-md";
+                btnMedia.className = "flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-sm font-bold transition-all bg-slate-800/80 text-slate-400 border border-slate-700/50 hover:bg-slate-700/80";
+            } else {
+                btnMedia.className = "flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-sm font-black transition-all bg-amber-900/60 text-amber-400 border border-amber-500/50 shadow-md";
+                btnAlta.className = "flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-sm font-bold transition-all bg-slate-800/80 text-slate-400 border border-slate-700/50 hover:bg-slate-700/80";
+            }
+        };
+
+        function cargarDatos() {
+            // NUEVA COLECCIÓN: material_club (para no mezclar con la barra)
+            const repoRef = collection(db, 'artifacts', appID, 'public', 'data', 'material_club');
+            
+            onSnapshot(repoRef, (snapshot) => {
+                const items = [];
+                snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                
+                items.sort((a, b) => b.timestamp - a.timestamp);
+                renderizarItems(items);
+                
+                loadingDiv.classList.add('hidden');
+                contentDiv.classList.remove('hidden');
+            });
+        }
+
+        function renderizarItems(items) {
+            itemsList.innerHTML = '';
+            
+            if(items.length === 0) {
+                itemsList.innerHTML = `
+                    <div class="text-center py-12 bg-slate-900/50 backdrop-blur-sm rounded-3xl border border-slate-800/50 border-dashed">
+                        <i data-lucide="check-circle" class="mx-auto h-12 w-12 text-blue-500/50 mb-3"></i>
+                        <h3 class="text-lg font-bold text-slate-300">Almacén al día</h3>
+                        <p class="text-slate-500 text-sm mt-1">No hay pedidos de material pendientes.</p>
+                    </div>
+                `;
+            } else {
+                items.forEach(item => {
+                    const isAlta = item.urgency === 'alta';
+                    const badgeClass = isAlta ? 'bg-red-900/40 border-red-500/30 text-red-400' : 'bg-amber-900/40 border-amber-500/30 text-amber-400';
+                    const iconType = isAlta ? 'alert-circle' : 'clipboard-edit';
+                    const urgLabel = isAlta ? 'Urgente' : 'Previsión';
+
+                    const div = document.createElement('div');
+                    div.className = "bg-slate-900/80 backdrop-blur-xl p-5 sm:p-6 rounded-3xl shadow-xl border border-slate-700/50 flex flex-col sm:flex-row gap-5 items-start sm:items-center animate-fade-in";
+                    
+                    div.innerHTML = `
+                        <div class="flex-grow min-w-0 w-full">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="inline-flex items-center gap-1.5 rounded-lg ${badgeClass} border px-2.5 py-1 text-xs font-black tracking-wide">
+                                    <i data-lucide="${iconType}" class="w-3.5 h-3.5"></i> ${urgLabel}
+                                </span>
+                            </div>
+                            <p class="text-xl font-bold text-white break-words drop-shadow-sm">${item.text}</p>
+                        </div>
+
+                        <div class="flex items-center gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t border-slate-800 sm:border-0 mt-1 sm:mt-0">
+                            <!-- BOTÓN COMPARTIR -->
+                            <button onclick="avisarResponsable('${item.text}', '${item.urgency}')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-black transition-all btn-press shadow-sm border border-slate-700">
+                                <i data-lucide="share" class="w-5 h-5"></i> 
+                                <span class="sm:hidden lg:inline">Compartir</span>
+                            </button>
+                            
+                            <!-- BOTÓN COMPLETADO -->
+                            <button onclick="abrirModal('${item.id}')" class="p-3.5 text-slate-400 hover:text-blue-400 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all border border-slate-700 shadow-sm" title="Marcar como recibido">
+                                <i data-lucide="check" class="w-6 h-6 font-bold"></i>
+                            </button>
+                        </div>
+                    `;
+                    itemsList.appendChild(div);
+                });
+            }
+            lucide.createIcons();
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const textInput = document.getElementById('item-text');
+            const text = textInput.value.trim();
+            if(!text || !currentUser) return;
+
+            const newItem = {
+                text: text,
+                urgency: currentUrgency,
+                timestamp: Date.now()
+            };
+
+            try {
+                const repoRef = collection(db, 'artifacts', appID, 'public', 'data', 'material_club');
+                await addDoc(repoRef, newItem);
+                textInput.value = '';
+                setUrgency('alta');
+            } catch (err) {
+                console.error("Error añadiendo:", err);
+            }
+        });
+
+        // ==========================================
+        // COMPARTIR NATIVO
+        // ==========================================
+        window.avisarResponsable = async function(texto, urgencia) {
+            const icono = urgencia === 'alta' ? '🔴 URGENTE' : '🟡 PREVISIÓN';
+            const mensaje = `Hola! Aviso de Material del Club:\n\n${icono}: ${texto}`;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Aviso de Material',
+                        text: mensaje
+                    });
+                } catch (error) {
+                    console.log('Error al compartir', error);
+                }
+            } else {
+                alert("Copia este mensaje y envíalo:\n\n" + mensaje);
+            }
+        };
+
+        window.abrirModal = function(id) {
+            itemToDelete = id;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.cerrarModal = function() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            itemToDelete = null;
+        };
+
+        btnConfirmar.addEventListener('click', async () => {
+            if(!itemToDelete) return;
+            const originalHtml = btnConfirmar.innerHTML;
+            btnConfirmar.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Eliminando...`;
+            
+            try {
+                await deleteDoc(doc(db, 'artifacts', appID, 'public', 'data', 'material_club', itemToDelete));
+                cerrarModal();
+            } catch (err) {
+                console.error("Error borrando:", err);
+            } finally {
+                btnConfirmar.innerHTML = originalHtml;
+            }
+        });
+
+    </script>
+</body>
+</html>
+
+```
