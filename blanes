@@ -1,9 +1,3 @@
-¡Por supuesto! Es una adaptación genial. El funcionamiento para controlar el stock de un club deportivo con tantos jugadores (donde siempre faltan tallas sueltas, balones que se pinchan o petos que se pierden) es exactamente el mismo que el de la barra, pero cambiando el enfoque visual y los textos.
-
-Para que no se te mezclen los datos de la cafetería con los del club de fútbol, he configurado esta aplicación para que guarde la información en una **"carpeta" nueva dentro de tu misma base de datos** (la he llamado `material_club`). Así puedes usar las mismas claves de Firebase y tenerlo todo bajo tu control en la misma cuenta, pero totalmente separado.
-
-Le he dado un diseño más deportivo (tonos azul marino oscuro y un verde "césped") y he adaptado todos los textos. Aquí tienes el código listo para guardar como `index.html` en un nuevo repositorio de GitHub:
-
 ```html:App Stock Deportivo:index.html
 <!DOCTYPE html>
 <html lang="es" class="dark">
